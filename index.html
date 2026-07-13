@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Aviso de Avería — HMYS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1C1F22;
+    --ink-soft: #6B6F76;
+    --paper: #F7F5F2;
+    --card: #FFFFFF;
+    --orange: #E8630A;
+    --orange-dark: #C34F05;
+    --steel: #3A5169;
+    --line: #DEDAD2;
+    --ok: #3F7D4E;
+    --danger: #B23A2E;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Barlow', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .wrap {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: var(--paper);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---- Ticket header ---- */
+  header {
+    background: var(--ink);
+    color: #fff;
+    padding: 28px 24px 22px;
+    position: relative;
+  }
+  .logo-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .logo-mark {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 40px;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    color: #E8630A;
+  }
+  .ticket-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: #B6BAC0;
+    border: 1px solid #3A3D42;
+    border-radius: 20px;
+    padding: 4px 10px;
+    margin-top: 8px;
+  }
+  .eyebrow-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #8B8F94;
+    margin: -10px 0 16px;
+  }
+  h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 22px;
+    line-height: 1.15;
+    margin: 0 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+  }
+  .sub {
+    font-size: 14px;
+    color: #B6BAC0;
+    margin: 0;
+  }
+
+  .perforation {
+    height: 18px;
+    background: var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+  .perforation::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 9px;
+    height: 0;
+    border-top: 2px dashed #4A4E53;
+  }
+  .perforation .notch {
+    position: absolute;
+    width: 22px; height: 22px;
+    background: var(--paper);
+    border-radius: 50%;
+    top: -3px;
+  }
+  .notch.left { left: -11px; }
+  .notch.right { right: -11px; }
+
+  main { padding: 22px 20px 100px; flex: 1; }
+
+  .field { margin-bottom: 20px; }
+  label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 7px;
+  }
+  input[type="text"], textarea {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    background: var(--card);
+    border-radius: 10px;
+    padding: 13px 14px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 16px;
+    color: var(--ink);
+  }
+  input[type="text"]:focus, textarea:focus {
+    outline: none;
+    border-color: var(--orange);
+  }
+  textarea { resize: vertical; min-height: 90px; line-height: 1.4; }
+
+  /* ---- Photo section ---- */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .photo-thumb {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--card);
+    border: 1.5px solid var(--line);
+  }
+  .photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-thumb button {
+    position: absolute; top: 3px; right: 3px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(28,31,34,0.75);
+    color: #fff;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .add-photo-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1.5px dashed var(--line);
+    background: var(--card);
+    color: var(--steel);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  .add-photo-btn:active { background: #EFEDE9; }
+
+  /* ---- Audio recorder ---- */
+  .audio-box {
+    background: var(--card);
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .rec-btn {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    border: none;
+    background: var(--orange);
+    color: #fff;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .rec-btn.recording {
+    background: var(--danger);
+    animation: pulse 1.2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(178,58,46,0.45); }
+    70% { box-shadow: 0 0 0 12px rgba(178,58,46,0); }
+    100% { box-shadow: 0 0 0 0 rgba(178,58,46,0); }
+  }
+  .rec-btn svg { width: 20px; height: 20px; }
+  .audio-status { font-size: 14px; color: var(--ink-soft); flex: 1; }
+  .audio-status strong { color: var(--ink); font-family: 'JetBrains Mono', monospace; }
+  .audio-clear {
+    background: none; border: none; color: var(--ink-soft);
+    text-decoration: underline; font-size: 13px; cursor: pointer; padding: 0;
+  }
+  audio { width: 100%; margin-top: 10px; }
+
+  /* ---- Submit bar ---- */
+  .submit-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 14px 20px 20px;
+    background: linear-gradient(to top, var(--paper) 60%, rgba(247,245,242,0));
+  }
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    border: none;
+    background: var(--orange);
+    color: #fff;
+    font-family: 'Barlow', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(232,99,10,0.35);
+  }
+  .submit-btn:active { background: var(--orange-dark); }
+  .submit-btn:disabled { background: #C7C3BB; box-shadow: none; }
+
+  .hint { font-size: 12.5px; color: var(--ink-soft); margin-top: 8px; line-height: 1.4; }
+
+  .status-msg {
+    font-size: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .status-msg.show { display: block; }
+  .status-msg.error { background: #FBEAE7; color: var(--danger); }
+  .status-msg.ok { background: #E8F3EA; color: var(--ok); }
+
+  /* ---- Success screen ---- */
+  .success-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 30px;
+    flex: 1;
+  }
+  .success-screen.show { display: flex; }
+  .success-icon {
+    width: 68px; height: 68px;
+    border-radius: 50%;
+    background: var(--ok);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 22px;
+  }
+  .success-screen h2 {
+    font-family: 'Archivo Black', sans-serif;
+    text-transform: uppercase;
+    font-size: 20px;
+    margin: 0 0 10px;
+  }
+  .success-screen p { color: var(--ink-soft); font-size: 15px; line-height: 1.5; margin: 0; }
+  .ticket-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 22px;
+    letter-spacing: 0.05em;
+  }
+
+  input[type="file"] { display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo-row">
+      <span class="logo-mark">HMYS</span>
+      <span class="ticket-badge" id="ticketPreview">#——</span>
+    </div>
+    <p class="eyebrow-sub">Mantenimiento y servicios · Manteniment i serveis</p>
+    <h1>Aviso de&nbsp;avería</h1>
+    <p class="sub">Cuéntanos qué pasa — con foto o voz es más rápido<br>Explica'ns què passa — amb foto o veu és més ràpid</p>
+  </header>
+  <div class="perforation"><span class="notch left"></span><span class="notch right"></span></div>
+
+  <main>
+    <form id="avisoForm">
+
+      <div class="status-msg" id="statusMsg"></div>
+
+      <div class="field">
+        <label for="nombre">Tu nombre / El teu nom</label>
+        <input type="text" id="nombre" name="nombre" required autocomplete="name">
+      </div>
+
+      <div class="field">
+        <label for="direccion">Dirección / vivienda &middot; Adreça / habitatge</label>
+        <input type="text" id="direccion" name="direccion" required placeholder="Calle, número, piso... / Carrer, número, pis...">
+      </div>
+
+      <div class="field">
+        <label for="descripcion">¿Qué ha pasado? &middot; Què ha passat?</label>
+        <textarea id="descripcion" name="descripcion" placeholder="Describe el problema (opcional si grabas audio) / Descriu el problema (opcional si graves àudio)"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Fotos del problema &middot; Fotos de l'avaria</label>
+        <div class="photo-grid" id="photoGrid"></div>
+        <button type="button" class="add-photo-btn" id="addPhotoBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Hacer foto / elegir de galería &middot; Fer foto / triar de galeria
+        </button>
+        <input type="file" id="photoInput" accept="image/*" capture="environment" multiple>
+      </div>
+
+      <div class="field">
+        <label>Nota de voz &middot; Nota de veu</label>
+        <div class="audio-box">
+          <button type="button" class="rec-btn" id="recBtn">
+            <svg id="recIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a1 1 0 0 0-2 0 5 5 0 0 1-10 0 1 1 0 0 0-2 0 7 7 0 0 0 6 6.92V20H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2h-2v-2.08A7 7 0 0 0 19 11z"/></svg>
+          </button>
+          <div class="audio-status" id="audioStatus">Toca para grabar / Toca per gravar</div>
+          <button type="button" class="audio-clear" id="audioClear" style="display:none;">borrar / esborra</button>
+        </div>
+        <audio id="audioPreview" controls style="display:none;"></audio>
+      </div>
+
+    </form>
+  </main>
+
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2>Aviso enviado &middot; Avís enviat</h2>
+    <p>HMYS ha recibido tu aviso y se pondrá en contacto contigo en cuanto lo revise.<br>HMYS ha rebut el teu avís i es posarà en contacte amb tu quan el revisi.</p>
+    <div class="ticket-id" id="ticketIdFinal"></div>
+  </div>
+
+  <div class="submit-bar" id="submitBar">
+    <button type="submit" form="avisoForm" class="submit-btn" id="submitBtn">Enviar aviso / Enviar avís</button>
+    <div class="hint">Se enviará directamente al equipo de HMYS &middot; S'enviarà directament a l'equip de HMYS</div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   CONFIGURACIÓN — se rellenará al conectar el envío de email
+   ========================================================= */
+const ENDPOINT_URL = "/.netlify/functions/enviar-aviso"; // función serverless (se activa al desplegar)
+
+/* ---- Dirección pre-rellenada vía QR: averias.hmys.es?dir=Calle+Mayor+12 ---- */
+const params = new URLSearchParams(window.location.search);
+const dirParam = params.get('dir');
+if (dirParam) document.getElementById('direccion').value = dirParam;
+
+/* ---- Nº de ticket visual (solo referencia local) ---- */
+const ticketId = 'HMYS-' + Date.now().toString().slice(-6);
+document.getElementById('ticketPreview').textContent = '#' + ticketId.slice(-6);
+
+/* ---- Fotos ---- */
+const photoInput = document.getElementById('photoInput');
+const photoGrid = document.getElementById('photoGrid');
+const addPhotoBtn = document.getElementById('addPhotoBtn');
+let photos = []; // { file, dataUrl }
+
+addPhotoBtn.addEventListener('click', () => photoInput.click());
+
+photoInput.addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files);
+  for (const file of files) {
+    const compressed = await compressImage(file, 1280, 0.72);
+    photos.push(compressed);
+    renderPhotos();
+  }
+  photoInput.value = '';
+});
+
+function renderPhotos() {
+  photoGrid.innerHTML = '';
+  photos.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'photo-thumb';
+    div.innerHTML = `<img src="${p.dataUrl}"><button type="button" data-i="${i}">&times;</button>`;
+    photoGrid.appendChild(div);
+  });
+  photoGrid.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      photos.splice(Number(btn.dataset.i), 1);
+      renderPhotos();
+    });
+  });
+}
+
+function compressImage(file, maxDim, quality) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = (e) => { img.src = e.target.result; };
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > height && width > maxDim) { height *= maxDim / width; width = maxDim; }
+      else if (height > maxDim) { width *= maxDim / height; height = maxDim; }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL('image/jpeg', quality);
+      resolve({ dataUrl, name: file.name.replace(/\.[^.]+$/, '.jpg') });
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ---- Audio ---- */
+const recBtn = document.getElementById('recBtn');
+const audioStatus = document.getElementById('audioStatus');
+const audioPreview = document.getElementById('audioPreview');
+const audioClear = document.getElementById('audioClear');
+let mediaRecorder, audioChunks = [], recording = false, audioDataUrl = null, recStart = 0, timerInt = null;
+
+function pickSupportedMimeType() {
+  const candidates = [
+    'audio/mp4',
+    'audio/webm;codecs=opus',
+    'audio/webm',
+    'audio/ogg;codecs=opus',
+    'audio/aac'
+  ];
+  for (const type of candidates) {
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(type)) {
+      return type;
+    }
+  }
+  return '';
+}
+
+recBtn.addEventListener('click', async () => {
+  if (!recording) {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      audioStatus.textContent = 'Este navegador no permite grabar audio. Prueba con Chrome o Safari actualizado.';
+      return;
+    }
+    if (!window.MediaRecorder) {
+      audioStatus.textContent = 'Este navegador no soporta grabación de audio.';
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = pickSupportedMimeType();
+      mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+      audioChunks = [];
+      mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) audioChunks.push(e.data); };
+      mediaRecorder.onerror = (e) => {
+        audioStatus.textContent = 'Error al grabar: ' + (e.error ? e.error.message : 'desconocido');
+        clearInterval(timerInt);
+        recording = false;
+        recBtn.classList.remove('recording');
+      };
+      mediaRecorder.onstop = () => {
+        if (audioChunks.length === 0) {
+          audioStatus.textContent = 'No se grabó audio, inténtalo de nuevo';
+          stream.getTracks().forEach(t => t.stop());
+          return;
+        }
+        const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || mimeType || 'audio/webm' });
+        const reader = new FileReader();
+        reader.onload = () => {
+          audioDataUrl = reader.result;
+          audioPreview.src = audioDataUrl;
+          audioPreview.style.display = 'block';
+          audioClear.style.display = 'inline';
+        };
+        reader.onerror = () => { audioStatus.textContent = 'No se pudo procesar el audio grabado'; };
+        reader.readAsDataURL(blob);
+        stream.getTracks().forEach(t => t.stop());
+      };
+      mediaRecorder.start();
+      recording = true;
+      recBtn.classList.add('recording');
+      recStart = Date.now();
+      timerInt = setInterval(() => {
+        const s = Math.floor((Date.now() - recStart) / 1000);
+        audioStatus.innerHTML = `Grabando... <strong>${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}</strong>`;
+      }, 250);
+    } catch (err) {
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        audioStatus.textContent = 'Permiso de micrófono denegado. Revisa los ajustes del navegador.';
+      } else if (err.name === 'NotFoundError') {
+        audioStatus.textContent = 'No se encontró micrófono en este dispositivo.';
+      } else {
+        audioStatus.textContent = 'No se pudo grabar: ' + err.message;
+      }
+    }
+  } else {
+    mediaRecorder.stop();
+    recording = false;
+    recBtn.classList.remove('recording');
+    clearInterval(timerInt);
+    audioStatus.textContent = 'Nota de voz grabada / Nota de veu gravada';
+  }
+});
+
+audioClear.addEventListener('click', () => {
+  audioDataUrl = null;
+  audioPreview.style.display = 'none';
+  audioClear.style.display = 'none';
+  audioStatus.textContent = 'Toca para grabar / Toca per gravar';
+});
+
+/* ---- Envío ---- */
+const form = document.getElementById('avisoForm');
+const submitBtn = document.getElementById('submitBtn');
+const statusMsg = document.getElementById('statusMsg');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nombre = document.getElementById('nombre').value.trim();
+  const direccion = document.getElementById('direccion').value.trim();
+  const descripcion = document.getElementById('descripcion').value.trim();
+
+  if (!nombre || !direccion) {
+    showStatus('Rellena tu nombre y la dirección / Omple el teu nom i l\'adreça', 'error');
+    return;
+  }
+  if (!descripcion && photos.length === 0 && !audioDataUrl) {
+    showStatus('Añade una descripción, foto o nota de voz / Afegeix una descripció, foto o nota de veu', 'error');
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Enviando... / Enviant...';
+
+  const payload = {
+    ticketId,
+    nombre,
+    direccion,
+    descripcion,
+    fecha: new Date().toLocaleString('es-ES'),
+    photos: photos.map(p => ({ name: p.name, dataUrl: p.dataUrl })),
+    audio: audioDataUrl
+  };
+
+  try {
+    const res = await fetch(ENDPOINT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('Fallo en el envío');
+
+    document.getElementById('successScreen').classList.add('show');
+    document.getElementById('ticketIdFinal').textContent = 'Referencia / Referència: ' + ticketId;
+    document.getElementById('submitBar').style.display = 'none';
+    document.querySelector('main').style.display = 'none';
+  } catch (err) {
+    showStatus('No se pudo enviar. Comprueba tu conexión e inténtalo de nuevo. / No s\'ha pogut enviar. Comprova la connexió i torna-ho a provar.', 'error');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Enviar aviso / Enviar avís';
+  }
+});
+
+function showStatus(msg, type) {
+  statusMsg.textContent = msg;
+  statusMsg.className = 'status-msg show ' + type;
+  statusMsg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
