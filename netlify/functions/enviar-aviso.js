@@ -23,7 +23,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: 'JSON inválido' };
   }
 
-  const { ticketId, nombre, direccion, descripcion, fecha, photos = [], audio } = data;
+  const { ticketId, nombre, direccion, telefono, descripcion, fecha, photos = [], audio } = data;
 
   if (!nombre || !direccion) {
     return { statusCode: 400, body: 'Faltan datos obligatorios' };
@@ -79,6 +79,7 @@ exports.handler = async (event) => {
       <table style="width:100%; border-collapse: collapse; margin: 16px 0;">
         <tr><td style="padding:6px 0; color:#666; width:110px;">Nombre</td><td style="padding:6px 0;"><b>${escapeHtml(nombre)}</b></td></tr>
         <tr><td style="padding:6px 0; color:#666;">Dirección</td><td style="padding:6px 0;"><b>${escapeHtml(direccion)}</b></td></tr>
+        ${telefono ? `<tr><td style="padding:6px 0; color:#666;">Teléfono</td><td style="padding:6px 0;"><b>${escapeHtml(telefono)}</b></td></tr>` : ''}
       </table>
       ${descripcion ? `<p style="white-space:pre-wrap;">${escapeHtml(descripcion)}</p>` : '<p style="color:#888;">(Sin descripción escrita — revisar fotos/audio adjuntos)</p>'}
       <p style="color:#888; font-size:13px; margin-top:20px;">
