@@ -10,6 +10,7 @@
 //                     averias@hmys.es, o info@hmys.es, o varias separadas por coma)
 
 const nodemailer = require('nodemailer');
+const { getStore } = require('@netlify/blobs');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -98,6 +99,25 @@ exports.handler = async (event) => {
       html: htmlBody,
       attachments
     });
+
+    // Guardamos un registro estructurado (sin fotos/audio, solo datos) para el informe diario
+    try {
+      const store = getStore('avisos');
+      await store.setJSON(ticketId || String(Date.now()), {
+        ticketId,
+        nombre,
+        direccion,
+        telefono: telefono || '',
+        descripcion: descripcion || '',
+        fecha,
+        numFotos: photos.length,
+        tieneAudio: !!audio,
+        timestamp: Date.now()
+      });
+    } catch (blobErr) {
+      console.error('No se pudo guardar el registro para el informe:', blobErr);
+      // No interrumpimos el envío del email aunque falle el guardado
+    }
 
     return { statusCode: 200, body: JSON.stringify({ ok: true }) };
   } catch (err) {
