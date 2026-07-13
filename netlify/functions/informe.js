@@ -12,7 +12,11 @@ exports.handler = async (event) => {
   const token = event.queryStringParameters && event.queryStringParameters.token;
 
   if (!process.env.INFORME_TOKEN || token !== process.env.INFORME_TOKEN) {
-    return { statusCode: 401, body: JSON.stringify({ error: 'No autorizado' }) };
+    return {
+      statusCode: 401,
+      headers: { 'Cache-Control': 'no-store' },
+      body: JSON.stringify({ error: 'No autorizado' })
+    };
   }
 
   try {
@@ -29,7 +33,7 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
       body: JSON.stringify({ total: registros.length, avisos: registros })
     };
   } catch (err) {
