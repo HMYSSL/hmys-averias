@@ -1,4 +1,4 @@
-// Función serverless (Netlify) que recibe el aviso del formulario
+/ Función serverless (Netlify) que recibe el aviso del formulario
 // y lo envía por email usando el SMTP de Strato (hmys.es).
 //
 // Variables de entorno necesarias (se configuran en el panel de Netlify,
@@ -71,8 +71,11 @@ exports.handler = async (event) => {
 
   const htmlBody = `
     <div style="font-family: Arial, sans-serif; max-width: 560px;">
-      <h2 style="color:#E8630A; margin-bottom:4px;">Nuevo aviso de avería</h2>
-      <p style="color:#888; margin-top:0; font-size:13px;">Referencia ${ticketId || ''} · ${fecha || ''}</p>
+      <div style="display:inline-block; background:#1C1F22; color:#E8630A; font-family:monospace; font-weight:bold; font-size:15px; padding:6px 14px; border-radius:6px; margin-bottom:12px;">
+        Expediente ${ticketId || 'S/N'}
+      </div>
+      <h2 style="color:#E8630A; margin:8px 0 4px;">Nuevo aviso de avería</h2>
+      <p style="color:#888; margin-top:0; font-size:13px;">${fecha || ''}</p>
       <table style="width:100%; border-collapse: collapse; margin: 16px 0;">
         <tr><td style="padding:6px 0; color:#666; width:110px;">Nombre</td><td style="padding:6px 0;"><b>${escapeHtml(nombre)}</b></td></tr>
         <tr><td style="padding:6px 0; color:#666;">Dirección</td><td style="padding:6px 0;"><b>${escapeHtml(direccion)}</b></td></tr>
@@ -90,7 +93,7 @@ exports.handler = async (event) => {
       from: `"Avisos HMYS" <${process.env.SMTP_USER}>`,
       to: destino,
       replyTo: process.env.SMTP_USER,
-      subject: `Nuevo aviso — ${direccion}`,
+      subject: `[${ticketId || 'S/N'}] Nuevo aviso — ${direccion}`,
       html: htmlBody,
       attachments
     });
