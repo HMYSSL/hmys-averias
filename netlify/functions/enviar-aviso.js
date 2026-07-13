@@ -1,4 +1,4 @@
-/ Función serverless (Netlify) que recibe el aviso del formulario
+// Función serverless (Netlify) que recibe el aviso del formulario
 // y lo envía por email usando el SMTP de Strato (hmys.es).
 //
 // Variables de entorno necesarias (se configuran en el panel de Netlify,
