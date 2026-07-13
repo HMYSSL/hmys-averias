@@ -1,0 +1,91 @@
+// Informe diario automático: se ejecuta solo, todos los días a las 18:00
+// (hora española de verano), sin que nadie tenga que pedirlo.
+// Recoge los avisos guardados y manda un resumen por email.
+//
+// Usa las mismas variables de entorno que enviar-aviso.js:
+//   SMTP_USER, SMTP_PASS, AVISO_DESTINO
+//
+// Nota sobre el horario: el cron está en UTC (16:00 UTC = 18:00 en horario
+// de verano español). En horario de invierno (octubre-marzo) llegará una
+// hora antes, a las 17:00. Si quieres que sea siempre exacto, se puede
+// ajustar dos veces al año.
+
+const { schedule } = require('@netlify/functions');
+const { getStore } = require('@netlify/blobs');
+const nodemailer = require('nodemailer');
+
+const handler = async () => {
+  const store = getStore('avisos');
+  const { blobs } = await store.list();
+
+  const registros = [];
+  for (const b of blobs) {
+    const data = await store.get(b.key, { type: 'json' });
+    if (data) registros.push(data);
+  }
+
+  // Solo los avisos de hoy (zona horaria España)
+  const hoy = new Date().toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid' });
+  const deHoy = registros.filter(r => {
+    if (!r.timestamp) return false;
+    const fechaAviso = new Date(r.timestamp).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid' });
+    return fechaAviso === hoy;
+  });
+
+  deHoy.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+  const filas = deHoy.length
+    ? deHoy.map(r => `
+        <tr>
+          <td style="padding:8px; border-bottom:1px solid #eee; font-family:monospace; font-size:12px;">${r.ticketId || ''}</td>
+          <td style="padding:8px; border-bottom:1px solid #eee;">${escapeHtml(r.nombre || '')}</td>
+          <td style="padding:8px; border-bottom:1px solid #eee;">${escapeHtml(r.direccion || '')}</td>
+          <td style="padding:8px; border-bottom:1px solid #eee;">${escapeHtml(r.telefono || '-')}</td>
+          <td style="padding:8px; border-bottom:1px solid #eee;">${r.numFotos ? '📷 ' + r.numFotos : ''} ${r.tieneAudio ? '🎙️' : ''}</td>
+        </tr>`).join('')
+    : `<tr><td colspan="5" style="padding:16px; text-align:center; color:#888;">Ningún aviso hoy</td></tr>`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 640px;">
+      <h2 style="color:#E8630A; margin-bottom:4px;">Informe diario de averías — HMYS</h2>
+      <p style="color:#888; margin-top:0; font-size:13px;">${hoy} · ${deHoy.length} aviso(s)</p>
+      <table style="width:100%; border-collapse: collapse; margin-top:16px; font-size:13px;">
+        <tr style="background:#1C1F22; color:#fff;">
+          <td style="padding:8px;">Ref.</td>
+          <td style="padding:8px;">Nombre</td>
+          <td style="padding:8px;">Dirección</td>
+          <td style="padding:8px;">Teléfono</td>
+          <td style="padding:8px;">Adjuntos</td>
+        </tr>
+        ${filas}
+      </table>
+    </div>
+  `;
+
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.strato.de',
+    port: 465,
+    secure: true,
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+  });
+
+  const destino = process.env.AVISO_DESTINO || process.env.SMTP_USER;
+
+  await transporter.sendMail({
+    from: `"Informe HMYS" <${process.env.SMTP_USER}>`,
+    to: destino,
+    subject: `Informe diario de averías — ${hoy} (${deHoy.length})`,
+    html
+  });
+
+  return { statusCode: 200, body: 'Informe enviado' };
+};
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+exports.handler = schedule('0 16 * * *', handler);
